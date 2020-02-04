@@ -1,1 +1,8 @@
-/* You can add global styles to this file, and also import other style files */
+.btn-no-focus:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+input {
+  border: none;
+  border-bottom: 1px solid var(--info);
+}

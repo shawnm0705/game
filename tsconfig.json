@@ -1,11 +1,19 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
+    "baseUrl": "src",
+    "paths": {
+      "@app/*": ["app/*"],
+      "@pipes/*": ["app/shared/pipes/*"],
+      "@services/*": ["app/shared/services/*"],
+      "@environments/*": ["environments/*"],
+      "@shared/*": ["app/shared/*"],
+    },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,
+    "esModuleInterop": true,
     "experimentalDecorators": true,
     "module": "esnext",
     "moduleResolution": "node",

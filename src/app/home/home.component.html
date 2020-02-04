@@ -1,1 +1,19 @@
-<p>home works!</p>
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <button
+        class="btn btn-outline-info btn-sm btn-no-focus float-right m-2"
+        (click)="storage.toggleLang()">{{ storage.getLang() === 'en' ? 'English' : '中文' }}</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6 col-md-3">
+      <div class="card" (click)="goto('davinci_code')">
+        <img src="/assets/davinci_code.jpg" class="card-img-top" alt="Davinci Code">
+        <div class="p-2 text-center">
+          <b>{{ utils.lang('Davinci Code') }}</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

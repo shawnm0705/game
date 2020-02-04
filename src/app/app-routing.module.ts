@@ -7,6 +7,10 @@ const routes: Routes = [
     loadChildren: './home/home.module#HomeModule',
   },
   {
+    path: 'room',
+    loadChildren: './room/room.module#RoomModule',
+  },
+  {
     path: '**',
     redirectTo: '',
   },
