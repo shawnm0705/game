@@ -65,4 +65,16 @@ export class StorageService {
     }
     this.set('isHost', isHost);
   }
+
+  /******************
+    Game Data
+  ******************/
+  getGameData() {
+    return this.get('gameData');
+  }
+
+  setGameData(data: any) {
+    this.set('gameData', data);
+  }
+
 }

@@ -20,7 +20,7 @@ export class UtilsService {
     'Create Room': '创建房间',
     'Join Room': '进入房间',
     'My Room Id': '我的房间号',
-    'People In My Room': '房间成员',
+    'People In The Room': '房间成员',
     'people': '人',
     'Start Game': '开始游戏',
     'Room Number': '房间号',

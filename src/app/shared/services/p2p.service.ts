@@ -37,7 +37,7 @@ export class P2PService {
   // send data to all connected peers
   send(data: any): void {
     this.connections.forEach(connection => {
-      connection.send(data);
+      connection.on('open', () => connection.send(data));
     });
   }
 }
