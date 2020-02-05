@@ -35,9 +35,13 @@ export class P2PService {
   }
 
   // send data to all connected peers
-  send(data: any): void {
+  send(data: any, firstTime = false): void {
     this.connections.forEach(connection => {
-      connection.on('open', () => connection.send(data));
+      if (firstTime) {
+        connection.on('open', () => connection.send(data));
+      } else {
+        connection.send(data);
+      }
     });
   }
 }

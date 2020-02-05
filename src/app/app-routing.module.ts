@@ -11,6 +11,10 @@ const routes: Routes = [
     loadChildren: './room/room.module#RoomModule',
   },
   {
+    path: 'davinci_code',
+    loadChildren: './davinci-code/davinci-code.module#DavinciCodeModule',
+  },
+  {
     path: '**',
     redirectTo: '',
   },

@@ -67,6 +67,8 @@ export class RoomComponent implements OnInit {
         this.storage.setGameData(gameData);
         // connect to this new peer
         this.p2p.connect(res.id);
+        // send the info to the new user
+        this.p2p.send(gameData, true);
         // broadcast the latest info to all users
         this.p2p.send(gameData);
       }
@@ -74,6 +76,11 @@ export class RoomComponent implements OnInit {
       // room member user receive the data to update members
       if (this.utils.has(res, 'members')) {
         this.roomMembers = res.members.map(member => member.name);
+      }
+
+      // room member user receive the data to start the game
+      if (this.utils.has(res, 'startGame') && res.startGame) {
+        this.router.navigate([res.game]);
       }
     });
   }
@@ -99,11 +106,14 @@ export class RoomComponent implements OnInit {
       return;
     }
     this.p2p.connect(this.roomId);
-    this.p2p.send({
-      newUser: true,
-      id: this.p2p.getId(),
-      name: this.storage.get('name')
-    });
+    this.p2p.send(
+      {
+        newUser: true,
+        id: this.p2p.getId(),
+        name: this.storage.get('name')
+      },
+      true
+    );
     this.joiningRoom = true;
   }
 
@@ -112,7 +122,13 @@ export class RoomComponent implements OnInit {
    * Start the game
    */
   start() {
-
+    // tell room member to start the game
+    this.p2p.send({
+      startGame: true,
+      game: this.game
+    });
+    // go the game route
+    this.router.navigate([this.game]);
   }
 
 }

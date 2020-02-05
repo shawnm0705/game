@@ -19,7 +19,6 @@ export class HomeComponent implements OnInit {
   }
 
   goto(game) {
-    this.storage.set('game', game);
     this.router.navigate(['room', game]);
   }
 
