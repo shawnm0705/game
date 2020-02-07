@@ -1,0 +1,5 @@
+<div class="text-center">
+  <div *ngIf="!placeholder" class="card mb-1" [ngClass]="{'selected': selected, 'black': color === 'black'}">{{ content }}</div>
+  <div *ngIf="placeholder" class="card mb-1 placeholder"></div>
+  <p>{{ mark }}<ng-container *ngIf="opened"><fa-icon icon="eye" class="text-info ml-1"></fa-icon></ng-container></p>
+</div>

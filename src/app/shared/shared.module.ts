@@ -2,7 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { fas, faCog, faArrowLeft, faUserAlt, faEye } from '@fortawesome/free-solid-svg-icons';
 import { UtilsService } from './services/utils.service';
 import { P2PService} from './services/p2p.service';
 
@@ -30,4 +31,9 @@ import { P2PService} from './services/p2p.service';
     ReactiveFormsModule,
   ]
 })
-export class SharedModule { }
+export class SharedModule {
+  constructor(library: FaIconLibrary) {
+    library.addIconPacks(fas);
+    library.addIcons(faUserAlt, faArrowLeft, faCog, faEye);
+  }
+}

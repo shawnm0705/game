@@ -1,5 +1,5 @@
 <div class="m-3">
-  <button class="border-0 bg-transparent text-primary" (click)="back()"><fa-icon [icon]="faArrowLeft"></fa-icon></button>
+  <button class="border-0 bg-transparent text-primary" (click)="back()"><fa-icon icon="arrow-left"></fa-icon></button>
   <h2 class="text-center">{{ utils.lang(games[game].name) }}</h2>
 </div>
 
@@ -29,7 +29,7 @@
         <p>{{ utils.lang('My Room Id') }}: <span class="text-info">{{ p2p.getId() }}</span></p>
         <p>{{ utils.lang('People In The Room') }}: ({{ games[game].min }} - {{ games[game].max }} {{ utils.lang('people') }})</p>
         <ul class="list-group mt-2">
-          <li *ngFor="let member of roomMembers" class="list-group-item"><fa-icon [icon]="faUserAlt" class="text-info mr-2"></fa-icon>{{ member }}</li>
+          <li *ngFor="let member of roomMembers" class="list-group-item"><fa-icon icon="user-alt" class="text-info mr-2"></fa-icon>{{ member }}</li>
         </ul>
       </div>
       <div class="col-12 text-center mt-2">
@@ -46,7 +46,7 @@
       <div *ngIf="roomMembers.length > 1" class="col-12 text-left">
         <p>{{ utils.lang('People In The Room') }}: ({{ games[game].min }} - {{ games[game].max }} {{ utils.lang('people') }})</p>
         <ul class="list-group mt-2">
-          <li *ngFor="let member of roomMembers" class="list-group-item"><fa-icon [icon]="faUserAlt" class="text-info mr-2"></fa-icon>{{ member }}</li>
+          <li *ngFor="let member of roomMembers" class="list-group-item"><fa-icon icon="user-alt" class="text-info mr-2"></fa-icon>{{ member }}</li>
         </ul>
       </div>
     </div>
@@ -54,20 +54,3 @@
   </ng-container>
 
 </div>
-
-<!-- <p>ID: {{ peer.id }}</p>
-{{ 'Connect To' }}: <input type="text" [(ngModel)]="anotherId">
-<button (click)="connect()" class="btn btn-primary">Connect</button>
-<br/>
-Send: <input type="text" [(ngModel)]="msg">
-<button (click)="send()" class="btn btn-primary">Send</button>
-<br/>
-Message Sent:
-<ul>
-  <li *ngFor="let msg of messageSent">{{ msg }}</li>
-</ul>
-<br/>
-Message Received:
-<ul>
-  <li *ngFor="let msg of messageReceived">{{ msg }}</li>
-</ul> -->

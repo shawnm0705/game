@@ -1,1 +1,82 @@
-<p>davinci-code works!</p>
+<div *ngIf="!isPrepared" class="text-center">
+  <h2 class="m-5">{{ utils.lang('Pick') }} {{ initCardCount() }} {{ utils.lang('cards') }}</h2>
+  <div class="container">
+    <div class="row">
+      <div *ngFor="let n of [1,2,3,4]" class="col-3">
+        <app-davinci-code-card
+          color="black"
+          [selected]="initialCards.includes(n)"
+          (click)="selectInitialCard(n)"
+          ></app-davinci-code-card>
+      </div>
+    </div>
+    <div class="row my-5">
+      <div *ngFor="let n of [5,6,7,8]" class="col-3">
+        <app-davinci-code-card
+          color="white"
+          [selected]="initialCards.includes(n)"
+          (click)="selectInitialCard(n)"
+          ></app-davinci-code-card>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <button class="btn btn-primary" [disabled]="initialCards.length !== initCardCount()" (click)="prepared()">{{ utils.lang('OK') }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-container *ngIf="isPrepared">
+  <div class="text-center">
+    <h2 *ngIf="isMyTurn" class="my-5">{{ utils.lang('My Turn') }}!</h2>
+    <h2 *ngIf="!isMyTurn" class="my-5">{{ utils.lang('Waiting For Others') }} <fa-icon icon="cog" spin="true"></fa-icon></h2>
+    <p *ngIf="me().cardWaitingForConfirm" class="text-primary">* {{ utils.lang('Please adjust the position of "-" card') }}</p>
+  </div>
+
+  <div *ngFor="let member of gameData.members" class="p-3">
+    <div class="container card p-2">
+      <div class="row">
+        <div class="col-12">
+          <fa-icon icon="user-alt" class="text-info mr-2"></fa-icon>
+          <span *ngIf="member.id !== p2p.getId()">{{ member.name }}</span>
+          <span *ngIf="member.id === p2p.getId()">{{ utils.lang('My Cards') }}</span>
+        </div>
+      </div>
+      <div *ngIf="member.cards" class="row row-cards my-3 px-2">
+        <ng-container *ngFor="let card of member.cards; let i = index">
+          <div *ngIf="me().cardWaitingForConfirm &&
+              card.mark !== me().cardWaitingForConfirm.mark && (
+                i === 0 ||
+                member.cards[i - 1].mark !== me().cardWaitingForConfirm.mark
+              )"
+            class="col">
+            <app-davinci-code-card class="my-2" placeholder=true (click)="reorderCardToIndex(i)"></app-davinci-code-card>
+          </div>
+          <div class="col">
+            <app-davinci-code-card
+              class="my-2"
+              [color]="card.color"
+              [mark]="card.mark"
+              [content]="card.content"
+              [opened]="card.opened"
+              ></app-davinci-code-card>
+          </div>
+        </ng-container>
+        <div *ngIf="me().cardWaitingForConfirm && me().cardWaitingForConfirm.mark !== member.cards[member.cards.length - 1].mark" class="col">
+          <app-davinci-code-card class="my-2" placeholder=true (click)="reorderCardToIndex(member.cards.length)"></app-davinci-code-card>
+        </div>
+      </div>
+      <div *ngIf="member.id === p2p.getId() && member.cardWaitingForConfirm" class="row text-center">
+        <div class="col-12">
+          <button class="btn btn-primary" (click)="cardConfirmed()">{{ utils.lang('OK') }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</ng-container>
+<div class="text-center mt-4">
+  <button class="btn btn-primary" (click)="next()">下一步</button>
+</div>
+
+

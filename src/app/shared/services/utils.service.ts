@@ -25,6 +25,13 @@ export class UtilsService {
     'Start Game': '开始游戏',
     'Room Number': '房间号',
     'Join': '进入',
+    'Pick': '选',
+    'cards': '张牌',
+    'My Turn': '我的回合',
+    'Waiting For Others': '等待其它玩家行动',
+    'Card Stack': '牌库',
+    'My Cards': '我的卡牌',
+    'Please adjust the position of "-" card': '请调整"-"卡牌的位置'
   };
   private _eventsSubject = new Subject<{key: string, value: any}>();
 
@@ -56,6 +63,9 @@ export class UtilsService {
   flattenDeep(array) {
     return this.lodash.flattenDeep(array);
   }
+  shuffle(collection) {
+    return this.lodash.shuffle(collection);
+  }
 
   /******************
     Event functions
@@ -80,7 +90,7 @@ export class UtilsService {
   ******************/
 
   // given an array and a value, check if this value is in this array, if it is, remove it, if not, add it to the array
-  addOrRemove(array: Array<any>, value) {
+  addOrRemove(array: any[], value): any[] {
     if (!array) {
       array = [];
     }

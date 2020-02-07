@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import Peer from 'peerjs';
 import { Router, ActivatedRoute } from '@angular/router';
 import { UtilsService} from '@services/utils.service';
 import { StorageService } from '@services/storage.service';
 import { P2PService } from '@services/p2p.service';
-import { faArrowLeft, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-room',
@@ -28,8 +26,6 @@ export class RoomComponent implements OnInit {
   // the room number to join
   roomId: string;
   joiningRoom: boolean;
-  faArrowLeft = faArrowLeft;
-  faUserAlt = faUserAlt;
 
   constructor(
     public utils: UtilsService,
@@ -76,6 +72,8 @@ export class RoomComponent implements OnInit {
       // room member user receive the data to update members
       if (this.utils.has(res, 'members')) {
         this.roomMembers = res.members.map(member => member.name);
+        // save game data in local storage (only need to know how many members are in the room)
+        this.storage.setGameData({members: res.members});
       }
 
       // room member user receive the data to start the game

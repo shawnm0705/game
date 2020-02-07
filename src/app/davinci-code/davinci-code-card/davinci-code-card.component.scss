@@ -1,0 +1,19 @@
+.card {
+  width: 40px;
+  height: 50px;
+  font-size: 25px;
+  margin: auto;
+  border-width: 3px;
+  color: black;
+  background: white;
+}
+.placeholder {
+  border: 2px dashed var(--orange);
+}
+.black {
+  color: white;
+  background: black;
+}
+.selected {
+  transform: scale(1.3);
+}
