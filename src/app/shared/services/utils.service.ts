@@ -29,9 +29,11 @@ export class UtilsService {
     'cards': '张牌',
     'My Turn': '我的回合',
     'Waiting For Others': '等待其它玩家行动',
-    'Card Stack': '牌库',
+    'Card Deck': '牌库',
     'My Cards': '我的卡牌',
-    'Please adjust the position of "-" card': '请调整"-"卡牌的位置'
+    'Please adjust the position of "-" card': '请调整"-"卡牌的位置',
+    'Please choose a card from the card deck': '请从牌库里选一张牌',
+    'Please choose a card from other people and guess': '请选择一张其他玩家的牌进行猜牌',
   };
   private _eventsSubject = new Subject<{key: string, value: any}>();
 

@@ -1,5 +1,5 @@
 <div *ngIf="!isPrepared" class="text-center">
-  <h2 class="m-5">{{ utils.lang('Pick') }} {{ initCardCount() }} {{ utils.lang('cards') }}</h2>
+  <h2 class="mt-3 mb-5">{{ utils.lang('Pick') }} {{ initCardCount() }} {{ utils.lang('cards') }}</h2>
   <div class="container">
     <div class="row">
       <div *ngFor="let n of [1,2,3,4]" class="col-3">
@@ -28,47 +28,119 @@
 </div>
 <ng-container *ngIf="isPrepared">
   <div class="text-center">
-    <h2 *ngIf="isMyTurn" class="my-5">{{ utils.lang('My Turn') }}!</h2>
-    <h2 *ngIf="!isMyTurn" class="my-5">{{ utils.lang('Waiting For Others') }} <fa-icon icon="cog" spin="true"></fa-icon></h2>
-    <p *ngIf="me().cardWaitingForConfirm" class="text-primary">* {{ utils.lang('Please adjust the position of "-" card') }}</p>
+    <h2 class="mt-3">
+      <ng-container *ngIf="isMyTurn()">{{ utils.lang('My Turn') }}!</ng-container>
+      <ng-container *ngIf="!isMyTurn()">{{ utils.lang('Waiting For Others') }} <fa-icon icon="cog" spin="true"></fa-icon></ng-container>
+    </h2>
+    <p *ngIf="instruction()" class="text-primary">* {{ instruction() }}</p>
   </div>
 
-  <div *ngFor="let member of gameData.members" class="p-3">
+  <div *ngFor="let member of gameData.members" class="px-3 pb-2">
     <div class="container card p-2">
+
       <div class="row">
         <div class="col-12">
           <fa-icon icon="user-alt" class="text-info mr-2"></fa-icon>
           <span *ngIf="member.id !== p2p.getId()">{{ member.name }}</span>
           <span *ngIf="member.id === p2p.getId()">{{ utils.lang('My Cards') }}</span>
+          <app-davinci-code-card
+            *ngIf="member.id === p2p.getId() && isGuessingCard()"
+            [color]="gameData.currentTurn.newCard.color"
+            [mark]="gameData.currentTurn.newCard.mark"
+            [content]="gameData.currentTurn.newCard.content"
+            ></app-davinci-code-card>
         </div>
       </div>
-      <div *ngIf="member.cards" class="row row-cards my-3 px-2">
+
+      <div *ngIf="member.cards && (member.id === p2p.getId() || !member.cardWaitingForConfirm)" class="row row-cards mt-3 px-2">
         <ng-container *ngFor="let card of member.cards; let i = index">
-          <div *ngIf="me().cardWaitingForConfirm &&
-              card.mark !== me().cardWaitingForConfirm.mark && (
-                i === 0 ||
-                member.cards[i - 1].mark !== me().cardWaitingForConfirm.mark
-              )"
-            class="col">
+          <div *ngIf="
+            member.id === p2p.getId() &&
+            me().cardWaitingForConfirm &&
+            card.mark !== me().cardWaitingForConfirm.mark && (
+              i === 0 ||
+              member.cards[i - 1].mark !== me().cardWaitingForConfirm.mark
+            )"
+            class="col-2">
             <app-davinci-code-card class="my-2" placeholder=true (click)="reorderCardToIndex(i)"></app-davinci-code-card>
           </div>
-          <div class="col">
+          <div class="col-2">
             <app-davinci-code-card
               class="my-2"
               [color]="card.color"
               [mark]="card.mark"
-              [content]="card.content"
+              [content]="member.id === p2p.getId() ? card.content : ''"
               [opened]="card.opened"
+              (click)="member.id !== p2p.getId() ? selectCardForGuessing(card) : null"
+              [selected]="guessCardMark === card.mark"
               ></app-davinci-code-card>
           </div>
         </ng-container>
-        <div *ngIf="me().cardWaitingForConfirm && me().cardWaitingForConfirm.mark !== member.cards[member.cards.length - 1].mark" class="col">
+        <div *ngIf="
+          member.id === p2p.getId() &&
+          me().cardWaitingForConfirm &&
+          me().cardWaitingForConfirm.mark !== member.cards[member.cards.length - 1].mark" class="col-2">
           <app-davinci-code-card class="my-2" placeholder=true (click)="reorderCardToIndex(member.cards.length)"></app-davinci-code-card>
         </div>
       </div>
+
+      <ng-container *ngIf="isGuessingCardOfMember(member)">
+        <div class="row row-cards px-2">
+          <div *ngFor="let content of CARDS" class="col-2">
+            <app-davinci-code-card
+              class="my-2"
+              placeholder=true
+              [content]="content"
+              (click)="!guessConfirming ? guessAs = content : null"
+              [selected]="guessAs === content"
+              ></app-davinci-code-card>
+          </div>
+        </div>
+        <div class="row text-center">
+          <div class="col-12">
+            <button class="btn btn-primary" [disabled]="!guessAs || guessConfirming" (click)="guessConfirmed()">{{ utils.lang('OK') }}</button>
+          </div>
+        </div>
+      </ng-container>
+
       <div *ngIf="member.id === p2p.getId() && member.cardWaitingForConfirm" class="row text-center">
         <div class="col-12">
           <button class="btn btn-primary" (click)="cardConfirmed()">{{ utils.lang('OK') }}</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="px-3 pb-2">
+    <div class="container card p-2">
+      <div class="row">
+        <div class="col-12">
+          <fa-icon icon="th-large" class="text-info mr-2"></fa-icon>
+          {{ utils.lang('Card Deck') }}
+        </div>
+      </div>
+      <div class="row row-cards my-3 px-2">
+        <div *ngFor="let card of gameData.deck.black; let i = index" class="col-2">
+          <app-davinci-code-card
+            class="my-2"
+            [color]="card.color"
+            [selected]="selectedCardFromDeckIndex === i"
+            (click)="selectCardFromDeck(i)"
+            ></app-davinci-code-card>
+        </div>
+        <div *ngFor="let card of gameData.deck.white; let i = index" class="col-2">
+          <app-davinci-code-card
+            class="my-2"
+            [color]="card.color"
+            [selected]="selectedCardFromDeckIndex === i + gameData.deck.black.length"
+            (click)="selectCardFromDeck(i + gameData.deck.black.length)"
+            ></app-davinci-code-card>
+        </div>
+      </div>
+      <div *ngIf="isSelectingCardFromDeck()" class="row text-center">
+        <div class="col-12">
+          <button class="btn btn-primary" [disabled]="selectedCardFromDeckIndex === null || selectedCardFromDeckConfirming" (click)="cardFromDeckConfirmed()">{{ utils.lang('OK') }}</button>
         </div>
       </div>
     </div>
