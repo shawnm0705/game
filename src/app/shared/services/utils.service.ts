@@ -28,12 +28,20 @@ export class UtilsService {
     'Pick': '选',
     'cards': '张牌',
     'My Turn': '我的回合',
+    'I Win': '我赢了',
     'Waiting For Others': '等待其它玩家行动',
     'Card Deck': '牌库',
     'My Cards': '我的卡牌',
+    'Skip': '结束本轮',
+    'History': '历史记录',
     'Please adjust the position of "-" card': '请调整"-"卡牌的位置',
     'Please choose a card from the card deck': '请从牌库里选一张牌',
     'Please choose a card from other people and guess': '请选择一张其他玩家的牌进行猜牌',
+    'or skip this turn': '或跳过本轮',
+    'Please wait for the response of the system': '请等待系统响应',
+    'guess card': '猜牌',
+    'as': '为',
+    'get card': '抽取了牌'
   };
   private _eventsSubject = new Subject<{key: string, value: any}>();
 

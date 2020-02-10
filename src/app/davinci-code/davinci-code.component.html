@@ -29,7 +29,10 @@
 <ng-container *ngIf="isPrepared">
   <div class="text-center">
     <h2 class="mt-3">
-      <ng-container *ngIf="isMyTurn()">{{ utils.lang('My Turn') }}!</ng-container>
+      <ng-container *ngIf="isMyTurn()">
+        <ng-container *ngIf="!gameData.currentTurn.gameEnds">{{ utils.lang('My Turn') }}!</ng-container>
+        <ng-container *ngIf="gameData.currentTurn.gameEnds">{{ utils.lang('I Win') }}!</ng-container>
+      </ng-container>
       <ng-container *ngIf="!isMyTurn()">{{ utils.lang('Waiting For Others') }} <fa-icon icon="cog" spin="true"></fa-icon></ng-container>
     </h2>
     <p *ngIf="instruction()" class="text-primary">* {{ instruction() }}</p>
@@ -42,45 +45,37 @@
         <div class="col-12">
           <fa-icon icon="user-alt" class="text-info mr-2"></fa-icon>
           <span *ngIf="member.id !== p2p.getId()">{{ member.name }}</span>
-          <span *ngIf="member.id === p2p.getId()">{{ utils.lang('My Cards') }}</span>
-          <app-davinci-code-card
-            *ngIf="member.id === p2p.getId() && isGuessingCard()"
-            [color]="gameData.currentTurn.newCard.color"
-            [mark]="gameData.currentTurn.newCard.mark"
-            [content]="gameData.currentTurn.newCard.content"
-            ></app-davinci-code-card>
+          <ng-container *ngIf="member.id === p2p.getId()">
+            <span>{{ utils.lang('My Cards') }}</span>
+            <app-davinci-code-card
+              *ngIf="isGuessingCard()"
+              [color]="gameData.currentTurn.newCard.color"
+              [mark]="gameData.currentTurn.newCard.mark"
+              [content]="gameData.currentTurn.newCard.content"
+              ></app-davinci-code-card>
+            <button *ngIf="gameData.currentTurn.guessCorrectly && !gameData.currentTurn.gameEnds && !me().cardWaitingForConfirm" class="btn btn-primary btn-sm" (click)="skipTurn()">{{ utils.lang('Skip') }}</button>
+          </ng-container>
         </div>
       </div>
 
-      <div *ngIf="member.cards && (member.id === p2p.getId() || !member.cardWaitingForConfirm)" class="row row-cards mt-3 px-2">
+      <div *ngIf="member.cards && (member.id === p2p.getId() || !member.cardWaitingForConfirm)" class="row row-cards mt-2 px-2">
         <ng-container *ngFor="let card of member.cards; let i = index">
-          <div *ngIf="
-            member.id === p2p.getId() &&
-            me().cardWaitingForConfirm &&
-            card.mark !== me().cardWaitingForConfirm.mark && (
-              i === 0 ||
-              member.cards[i - 1].mark !== me().cardWaitingForConfirm.mark
-            )"
-            class="col-2">
-            <app-davinci-code-card class="my-2" placeholder=true (click)="reorderCardToIndex(i)"></app-davinci-code-card>
+          <div *ngIf="showPlaceholderBeforeCard(member, i)" class="col-2">
+            <app-davinci-code-card placeholder=true (click)="reorderCardToIndex(i)"></app-davinci-code-card>
           </div>
           <div class="col-2">
             <app-davinci-code-card
-              class="my-2"
               [color]="card.color"
               [mark]="card.mark"
-              [content]="member.id === p2p.getId() ? card.content : ''"
+              [content]="member.id === p2p.getId() || card.opened ? card.content : ''"
               [opened]="card.opened"
               (click)="member.id !== p2p.getId() ? selectCardForGuessing(card) : null"
               [selected]="guessCardMark === card.mark"
               ></app-davinci-code-card>
           </div>
         </ng-container>
-        <div *ngIf="
-          member.id === p2p.getId() &&
-          me().cardWaitingForConfirm &&
-          me().cardWaitingForConfirm.mark !== member.cards[member.cards.length - 1].mark" class="col-2">
-          <app-davinci-code-card class="my-2" placeholder=true (click)="reorderCardToIndex(member.cards.length)"></app-davinci-code-card>
+        <div *ngIf="showPlaceholderAtLast(member)" class="col-2">
+          <app-davinci-code-card placeholder=true (click)="reorderCardToIndex(member.cards.length)"></app-davinci-code-card>
         </div>
       </div>
 
@@ -88,17 +83,16 @@
         <div class="row row-cards px-2">
           <div *ngFor="let content of CARDS" class="col-2">
             <app-davinci-code-card
-              class="my-2"
               placeholder=true
               [content]="content"
-              (click)="!guessConfirming ? guessAs = content : null"
+              (click)="!isWaitingForResponse() ? guessAs = content : null"
               [selected]="guessAs === content"
               ></app-davinci-code-card>
           </div>
         </div>
         <div class="row text-center">
           <div class="col-12">
-            <button class="btn btn-primary" [disabled]="!guessAs || guessConfirming" (click)="guessConfirmed()">{{ utils.lang('OK') }}</button>
+            <button class="btn btn-primary" [disabled]="[undefined, null].includes(guessAs) || isWaitingForResponse()" (click)="guessConfirmed()">{{ utils.lang('OK') }}</button>
           </div>
         </div>
       </ng-container>
@@ -123,7 +117,6 @@
       <div class="row row-cards my-3 px-2">
         <div *ngFor="let card of gameData.deck.black; let i = index" class="col-2">
           <app-davinci-code-card
-            class="my-2"
             [color]="card.color"
             [selected]="selectedCardFromDeckIndex === i"
             (click)="selectCardFromDeck(i)"
@@ -131,7 +124,6 @@
         </div>
         <div *ngFor="let card of gameData.deck.white; let i = index" class="col-2">
           <app-davinci-code-card
-            class="my-2"
             [color]="card.color"
             [selected]="selectedCardFromDeckIndex === i + gameData.deck.black.length"
             (click)="selectCardFromDeck(i + gameData.deck.black.length)"
@@ -143,6 +135,27 @@
           <button class="btn btn-primary" [disabled]="selectedCardFromDeckIndex === null || selectedCardFromDeckConfirming" (click)="cardFromDeckConfirmed()">{{ utils.lang('OK') }}</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="p-3">
+    <div class="card p-2">
+      <b>{{ utils.lang('History') }}</b>
+      <p *ngFor="let record of gameData.history; let i = index">
+        <ng-container *ngIf="record.guessAs === undefined">
+          <hr>
+          {{ record.name }} {{ utils.lang('get card') }}
+          <span class="text-info">{{ record.cardMark }}</span>
+        </ng-container>
+        <ng-container *ngIf="record.guessAs !== undefined">
+          {{ record.name }} {{ utils.lang('guess card') }}
+          <span class="text-info">{{ record.cardMark }}</span>
+          {{ utils.lang('as') }}
+          <span class="text-info">{{ record.guessAs }}</span>
+          <fa-icon *ngIf="record.result" icon="check" class="text-success ml-2"></fa-icon>
+          <fa-icon *ngIf="!record.result" icon="times" class="text-danger ml-2"></fa-icon>
+        </ng-container>
+      </p>
     </div>
   </div>
 
