@@ -42,7 +42,8 @@ export class UtilsService {
     'Please wait for the response of the system': '请等待系统响应',
     'guess card': '猜牌',
     'as': '为',
-    'get card': '抽取了牌'
+    'get card': '抽取了牌',
+    'Restart': '再来一局'
   };
   private _eventsSubject = new Subject<{key: string, value: any}>();
 

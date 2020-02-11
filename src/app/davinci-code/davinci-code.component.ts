@@ -70,34 +70,7 @@ export class DavinciCodeComponent implements OnInit {
     if (this.storage.isHost()) {
       // initialise game data
       this.gameData = this.storage.getGameData();
-      this.gameData.deck = {
-        // black: this.utils.shuffle(this.CARDS).map((card, i) => {
-          black: this.CARDS.map((card, i) => {
-          return {
-            color: 'black',
-            content: card,
-            mark: MARKS[i],
-            opened: false
-          };
-        }),
-        white: this.utils.shuffle(this.CARDS).map((card, i) => {
-          return {
-            color: 'white',
-            content: card,
-            mark: MARKS[i + 13],
-            opened: false
-          };
-        })
-      };
-      this.gameData.history = [];
-      this.gameData.currentTurn = {
-        memberIndex: null,
-        newCard: null,
-        waitingForConfirmation: false,
-        guessCorrectly: null,
-        waitingForResponse: false,
-        gameEnds: false
-      }
+      this.gameInit();
     }
     this.utils.getEvent('game-data').subscribe(res => {
       // member receive game data from host
@@ -145,6 +118,45 @@ export class DavinciCodeComponent implements OnInit {
         return this.memberSkipTurn();
       }
     });
+  }
+
+  gameInit() {
+    this.gameData.members.forEach((m, i) => {
+      this.gameData.members[i].cards = [];
+      this.gameData.members[i].cardWaitingForConfirm = null;
+    });
+    this.gameData.deck = {
+      black: this.utils.shuffle(this.CARDS).map((card, i) => {
+        return {
+          color: 'black',
+          content: card,
+          mark: MARKS[i],
+          opened: false
+        };
+      }),
+      white: this.utils.shuffle(this.CARDS).map((card, i) => {
+        return {
+          color: 'white',
+          content: card,
+          mark: MARKS[i + 13],
+          opened: false
+        };
+      })
+    };
+    this.gameData.history = [];
+    this.gameData.currentTurn = {
+      memberIndex: null,
+      newCard: null,
+      waitingForConfirmation: false,
+      guessCorrectly: null,
+      waitingForResponse: false,
+      gameEnds: false
+    };
+  }
+
+  restart() {
+    this.gameInit();
+    this.p2p.send(this.gameData);
   }
 
   /************************
