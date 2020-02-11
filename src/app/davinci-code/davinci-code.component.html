@@ -33,7 +33,9 @@
         <ng-container *ngIf="!gameData.currentTurn.gameEnds">{{ utils.lang('My Turn') }}!</ng-container>
         <ng-container *ngIf="gameData.currentTurn.gameEnds">{{ utils.lang('I Win') }}!</ng-container>
       </ng-container>
-      <ng-container *ngIf="!isMyTurn()">{{ utils.lang('Waiting For Others') }} <fa-icon icon="cog" spin="true"></fa-icon></ng-container>
+      <ng-container *ngIf="!isMyTurn()">
+        <ng-container *ngIf="!gameData.currentTurn.gameEnds">{{ utils.lang('Waiting For Others') }} <fa-icon icon="cog" spin="true"></fa-icon></ng-container>
+        <ng-container *ngIf="gameData.currentTurn.gameEnds">{{ utils.lang('Game Over') }}!</ng-container></ng-container>
     </h2>
     <p *ngIf="instruction()" class="text-primary">* {{ instruction() }}</p>
   </div>
@@ -53,7 +55,10 @@
               [mark]="gameData.currentTurn.newCard.mark"
               [content]="gameData.currentTurn.newCard.content"
               ></app-davinci-code-card>
-            <button *ngIf="gameData.currentTurn.guessCorrectly && !gameData.currentTurn.gameEnds && !me().cardWaitingForConfirm" class="btn btn-primary btn-sm" (click)="skipTurn()">{{ utils.lang('Skip') }}</button>
+            <button *ngIf="gameData.currentTurn.guessCorrectly &&
+              isMyTurn() &&
+              !gameData.currentTurn.gameEnds &&
+              !me().cardWaitingForConfirm" class="btn btn-primary btn-sm" (click)="skipTurn()">{{ utils.lang('Pass this turn') }}</button>
           </ng-container>
         </div>
       </div>

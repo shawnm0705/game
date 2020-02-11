@@ -3,20 +3,12 @@ import { Routes, RouterModule } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: '',
+    path: 'home',
     loadChildren: './home/home.module#HomeModule',
   },
   {
-    path: 'room',
-    loadChildren: './room/room.module#RoomModule',
-  },
-  {
-    path: 'davinci_code',
-    loadChildren: './davinci-code/davinci-code.module#DavinciCodeModule',
-  },
-  {
-    path: '**',
-    redirectTo: '',
+    path: '',
+    loadChildren: './game/game.module#GameModule',
   },
 ];
 

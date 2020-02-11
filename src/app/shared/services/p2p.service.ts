@@ -26,7 +26,7 @@ export class P2PService {
 
   // get the peer id of the current user
   getId() {
-    return 'abc'; // ------------------ for development only
+    // return 'abc'; // ------------------ for development only
     return this.peer.id;
   }
 
