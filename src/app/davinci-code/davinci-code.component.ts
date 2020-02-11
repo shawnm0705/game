@@ -517,7 +517,7 @@ export class DavinciCodeComponent implements OnInit {
     if (!this.isGuessingCard() || card.opened || this.isWaitingForResponse()) {
       return;
     }
-    this.guessCardMark = card.mark;console.log(this.gameData);
+    this.guessCardMark = card.mark;
   }
 
   /**
@@ -548,7 +548,7 @@ export class DavinciCodeComponent implements OnInit {
    * @param guessAs       Guess the card as
    */
   checkGuessResult(guessCardMark: string, guessAs: string | number): void {
-    const cardResult = this.findCardByMark(guessCardMark);console.log(cardResult);
+    const cardResult = this.findCardByMark(guessCardMark);
     if (!cardResult) {
       return;
     }
