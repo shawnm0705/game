@@ -45,7 +45,7 @@ export class StorageService {
     Language setting
   ******************/
   getLang() {
-    return this.get('lang') || 'en';
+    return this.get('lang') || 'zh';
   }
 
   setLang(lang) {

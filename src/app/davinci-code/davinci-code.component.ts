@@ -59,10 +59,10 @@ export class DavinciCodeComponent implements OnInit {
   selectedCardFromDeckConfirming: boolean;
   guessCardMark: string;
   guessAs: number | string = null;
-  notifications: {
+  notification: {
     newTurn: boolean;
     history: History;
-  }[] = [];
+  };
 
   constructor(
     public utils: UtilsService,
@@ -73,17 +73,22 @@ export class DavinciCodeComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    if (this.storage.isHost()) {
       // initialise game data
-      this.gameData = this.storage.getGameData();
-      this.gameInit();
-    }
+    this.gameData = this.storage.getGameData();
+    this.gameInit();
     this.utils.getEvent('game-data').subscribe(res => {
       // member receive game data from host
       if (!this.storage.isHost()) {
+        let delay = false;
         if (this.utils.has(this.gameData, 'history') && this.gameData.history.length < res.history.length) {
-          for (let i = this.gameData.history.length;i < res.history.length; i++) {
-            this.pushNotification(res.history[i]);
+          this.pushNotification(res.history[this.gameData.history.length]);
+          delay = true;
+        }
+        if (this.isMyTurn()) {
+          if (delay) {
+            setTimeout(() => this.pushNotification(null, true), 1000);
+          } else {
+            this.pushNotification(null, true);
           }
         }
         this.gameData = res;
@@ -99,6 +104,7 @@ export class DavinciCodeComponent implements OnInit {
       if (this.utils.has(res, 'cardConfirmed') && res.cardConfirmed) {
         const memberIndex = this.gameData.members.findIndex(m => m.id === res.id);
         this.gameData.members[memberIndex].cards = res.cards;
+        this.gameData.members[memberIndex].cardWaitingForConfirm = null;
         this.nextTurn();
         return this.p2p.send(this.gameData);
       }
@@ -175,16 +181,16 @@ export class DavinciCodeComponent implements OnInit {
 
   pushNotification(notification: History, newTurn = false) {
     // don't need to show notification on my turn
-    if (this.isMyTurn()) {
+    if (!newTurn && this.isMyTurn()) {
       return;
     }
-    this.notifications.push({
+    this.notification = {
       newTurn: newTurn,
       history: notification
-    });
+    };
     setTimeout(
       () => {
-        this.notifications.shift();
+        this.notification = null;
       },
       3000
     );
@@ -339,7 +345,9 @@ export class DavinciCodeComponent implements OnInit {
       }
       // skip member whose cards are all opened
     } while (!this.gameData.members[this.gameData.currentTurn.memberIndex].cards.find(c => !c.opened));
-
+    if (this.isMyTurn()) {
+      this.pushNotification(null, true);
+    }
     this.newTurnInit();
     this.p2p.send(this.gameData);
   }
