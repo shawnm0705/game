@@ -18,12 +18,14 @@ interface GameData {
     waitingForResponse: boolean;
     gameEnds: boolean;
   };
-  history: {
-    name: string;
-    cardMark: string;
-    guessAs?: string|number;
-    result?: boolean;
-  }[];
+  history: History[];
+}
+
+interface History {
+  name: string;
+  cardMark: string;
+  guessAs?: string|number;
+  result?: boolean;
 }
 
 interface Member {
@@ -57,6 +59,10 @@ export class DavinciCodeComponent implements OnInit {
   selectedCardFromDeckConfirming: boolean;
   guessCardMark: string;
   guessAs: number | string = null;
+  notifications: {
+    newTurn: boolean;
+    history: History;
+  }[] = [];
 
   constructor(
     public utils: UtilsService,
@@ -75,6 +81,11 @@ export class DavinciCodeComponent implements OnInit {
     this.utils.getEvent('game-data').subscribe(res => {
       // member receive game data from host
       if (!this.storage.isHost()) {
+        if (this.utils.has(this.gameData, 'history') && this.gameData.history.length < res.history.length) {
+          for (let i = this.gameData.history.length;i < res.history.length; i++) {
+            this.pushNotification(res.history[i]);
+          }
+        }
         this.gameData = res;
         return;
       }
@@ -120,6 +131,9 @@ export class DavinciCodeComponent implements OnInit {
     });
   }
 
+  /**
+   * Initial values when game start
+   */
   gameInit() {
     this.gameData.members.forEach((m, i) => {
       this.gameData.members[i].cards = [];
@@ -157,6 +171,23 @@ export class DavinciCodeComponent implements OnInit {
   restart() {
     this.gameInit();
     this.p2p.send(this.gameData);
+  }
+
+  pushNotification(notification: History, newTurn = false) {
+    // don't need to show notification on my turn
+    if (this.isMyTurn()) {
+      return;
+    }
+    this.notifications.push({
+      newTurn: newTurn,
+      history: notification
+    });
+    setTimeout(
+      () => {
+        this.notifications.shift();
+      },
+      3000
+    );
   }
 
   /************************
@@ -297,7 +328,7 @@ export class DavinciCodeComponent implements OnInit {
    */
   nextTurn(): void {
     // not ready for the next turn if not all members are prepared and confirmed on cards
-    if (this.gameData.members.find(m => !this.utils.has(m, 'cards') || m.cardWaitingForConfirm)) {
+    if (this.gameData.members.find(m => !m.cards.length || m.cardWaitingForConfirm)) {
       return;
     }
     do {
@@ -489,10 +520,12 @@ export class DavinciCodeComponent implements OnInit {
     if (!this.gameData.history) {
       this.gameData.history = [];
     }
-    this.gameData.history.push({
+    const history = {
       name: this.gameData.members[this.gameData.currentTurn.memberIndex].name,
       cardMark: this.gameData.currentTurn.newCard.mark
-    });
+    };
+    this.pushNotification(history);
+    this.gameData.history.push(history);
     this.p2p.send(this.gameData);
   }
 
@@ -564,12 +597,14 @@ export class DavinciCodeComponent implements OnInit {
     if (!cardResult) {
       return;
     }
-    this.gameData.history.push({
+    const history = {
       name: this.gameData.members[this.gameData.currentTurn.memberIndex].name,
       cardMark: guessCardMark,
       guessAs: guessAs,
       result: cardResult.card.content === guessAs
-    });
+    };
+    this.pushNotification(history);
+    this.gameData.history.push(history);
     this.gameData.currentTurn.waitingForResponse = false;
     if (cardResult.card.content === guessAs) {
       // guess correctly

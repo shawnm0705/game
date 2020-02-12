@@ -7,7 +7,7 @@
 
   <ng-container *ngIf="!storage.get('name')">
     <label>{{ utils.lang('Nick Name') }}:</label>
-    <input type="text" [(ngModel)]="name" class="mx-2">
+    <input type="text" [(ngModel)]="name" class="mx-2" style="width: 100px">
     <button class="btn btn-primary btn-sm" (click)="saveName()">{{ utils.lang('OK') }}</button>
   </ng-container>
 
@@ -40,7 +40,7 @@
     <div *ngIf="!storage.isHost()" class="row mt-3">
       <div *ngIf="roomMembers.length <= 1" class="col-12">
         <label>{{ utils.lang('Room Number') }}:</label>
-        <input type="text" [(ngModel)]="roomId" class="mx-2" style="width: 150px">
+        <input type="text" [(ngModel)]="roomId" class="mx-2" style="width: 100px">
         <button class="btn btn-success btn-sm" [disabled]="joiningRoom" (click)="join()">{{ utils.lang('Join') }}</button>
       </div>
       <div *ngIf="roomMembers.length > 1" class="col-12 text-left">

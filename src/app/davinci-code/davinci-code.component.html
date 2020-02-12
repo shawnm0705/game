@@ -143,10 +143,14 @@
     </div>
   </div>
 
+  <div *ngIf="gameData.currentTurn.gameEnds && storage.isHost()" class="text-center my-2">
+    <button class="btn btn-primary" (click)="restart()">{{ utils.lang('Restart') }}</button>
+  </div>
+
   <div class="p-3">
     <div class="card p-2">
       <b>{{ utils.lang('History') }}</b>
-      <p *ngFor="let record of gameData.history; let i = index">
+      <p *ngFor="let record of gameData.history; let i = index" class="mb-2">
         <ng-container *ngIf="record.guessAs === undefined">
           <hr>
           {{ record.name }} {{ utils.lang('get card') }}
@@ -163,7 +167,34 @@
       </p>
     </div>
   </div>
-  <div *ngIf="gameData.currentTurn.gameEnds && storage.isHost()" class="text-center mt-2">
-    <button class="btn btn-primary" (click)="restart()">{{ utils.lang('Restart') }}</button>
-  </div>
 </ng-container>
+
+<div class="fixed-top p-2">
+  <ng-container *ngFor="let notification of notifications.reverse()">
+    <div class="alert mt-2 text-center" role="alert" [ngClass]="{
+        'alert-primary': notification.newTurn,
+        'alert-info': !notification.newTurn && notification.history.guessAs === undefined,
+        'alert-success': !notification.newTurn && notification.history.guessAs !== undefined && notification.history.result,
+        'alert-danger': !notification.newTurn && notification.history.guessAs !== undefined && !notification.history.result
+      }">
+      <ng-container *ngIf="notification.newTurn">
+        <b>{{ utils.lang('My Turn') }} !</b>
+      </ng-container>
+      <ng-container *ngIf="!notification.newTurn">
+        <b>{{ notification.history.name }}</b>
+        <ng-container *ngIf="notification.history.guessAs === undefined">
+          {{ utils.lang('get card') }}
+          <span class="text-info">{{ notification.history.cardMark }}</span>
+        </ng-container>
+        <ng-container *ngIf="notification.history.guessAs !== undefined">
+          {{ utils.lang('guess card') }}
+          <span class="text-info">{{ notification.history.cardMark }}</span>
+          {{ utils.lang('as') }}
+          <span class="text-info">{{ notification.history.guessAs }}</span>
+          <fa-icon *ngIf="notification.history.result" icon="check" class="text-success ml-2"></fa-icon>
+          <fa-icon *ngIf="!notification.history.result" icon="times" class="text-danger ml-2"></fa-icon>
+        </ng-container>
+      </ng-container>
+    </div>
+  </ng-container>
+</div>

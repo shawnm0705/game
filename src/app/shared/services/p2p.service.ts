@@ -17,10 +17,11 @@ export class P2PService {
   init(): void {
     // reset connections
     this.connections = [];
-    if (this.peer) {
-      return;
-    }
-    this.peer = new Peer();
+    let id = '';
+    Array(4).fill(1).forEach(n => {
+      id += Math.floor((Math.random() * 9) + 1);
+    });
+    this.peer = new Peer(id);
     this.peer.on('connection', conn => conn.on('data', data => this.utils.broadcastEvent('game-data', data)));
   }
 

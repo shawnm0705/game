@@ -103,6 +103,9 @@ export class RoomComponent implements OnInit {
     if (!this.roomId) {
       return;
     }
+    while (this.roomId === this.p2p.getId()) {
+      this.p2p.init();
+    }
     this.p2p.connect(this.roomId);
     this.p2p.send(
       {
