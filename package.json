@@ -12,11 +12,11 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --prod",
+    "build": "ng build --prod --aot --base-href './'",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "deploy": "ng build --prod --base-href '/game/' && npx angular-cli-ghpages --dir=www"
+    "deploy": "ng build --prod --aot --base-href '/game/' && npx angular-cli-ghpages --dir=www"
   },
   "private": true,
   "dependencies": {

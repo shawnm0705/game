@@ -37,11 +37,12 @@
         <ng-container *ngIf="!gameData.currentTurn.gameEnds">{{ utils.lang('Waiting For Others') }} <fa-icon icon="cog" spin="true"></fa-icon></ng-container>
         <ng-container *ngIf="gameData.currentTurn.gameEnds">{{ utils.lang('Game Over') }}!</ng-container></ng-container>
     </h2>
+    <button *ngIf="!storage.isHost()" class="btn bg-transparent border-0 text-primary float-right" [disabled]="isRefreshing" (click)="refreshData()"><fa-icon icon="sync"></fa-icon></button>
     <p *ngIf="instruction()" class="text-primary">* {{ instruction() }}</p>
   </div>
 
   <div *ngFor="let member of gameData.members" class="px-3 pb-2">
-    <div class="container card p-2">
+    <div class="container card p-2" [ngClass]="isMyTurn(member) ? 'active' : ''">
 
       <div class="row">
         <div class="col-12">

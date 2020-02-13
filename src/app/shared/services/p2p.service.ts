@@ -15,6 +15,9 @@ export class P2PService {
 
   // initialise the peer connection. Broadcast game data once received
   init(): void {
+    if (this.peer) {
+      this.peer.destroy();
+    }
     // reset connections
     this.connections = [];
     let id = '';
@@ -27,7 +30,6 @@ export class P2PService {
 
   // get the peer id of the current user
   getId() {
-    // return 'abc'; // ------------------ for development only
     return this.peer.id;
   }
 

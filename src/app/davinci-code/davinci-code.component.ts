@@ -63,6 +63,7 @@ export class DavinciCodeComponent implements OnInit {
     newTurn: boolean;
     history: History;
   };
+  isRefreshing: boolean;
 
   constructor(
     public utils: UtilsService,
@@ -79,20 +80,22 @@ export class DavinciCodeComponent implements OnInit {
     this.utils.getEvent('game-data').subscribe(res => {
       // member receive game data from host
       if (!this.storage.isHost()) {
-        let delay = false;
+        if (this.utils.has(res, 'restart') && res.restart) {
+          return this.gameInit();
+        }
         if (this.utils.has(this.gameData, 'history') && this.gameData.history.length < res.history.length) {
           this.pushNotification(res.history[this.gameData.history.length]);
-          delay = true;
         }
-        if (this.isMyTurn()) {
-          if (delay) {
-            setTimeout(() => this.pushNotification(null, true), 1000);
-          } else {
-            this.pushNotification(null, true);
-          }
+        // if currently is not my turn, but the new data shows that it's my turn, push "my turn" notification
+        if (!this.isMyTurn() && res.currentTurn.memberIndex !== null && res.members[res.currentTurn.memberIndex].id === this.p2p.getId()) {
+          this.pushNotification(null, true);
         }
         this.gameData = res;
         return;
+      }
+
+      if (this.utils.has(res, 'refresh') && res.refresh) {
+        return this.p2p.send(this.gameData);
       }
 
       // host received data showing that a member has selected initial cards
@@ -141,6 +144,8 @@ export class DavinciCodeComponent implements OnInit {
    * Initial values when game start
    */
   gameInit() {
+    this.isPrepared = false;
+    this.initialCards = [];
     this.gameData.members.forEach((m, i) => {
       this.gameData.members[i].cards = [];
       this.gameData.members[i].cardWaitingForConfirm = null;
@@ -176,14 +181,12 @@ export class DavinciCodeComponent implements OnInit {
 
   restart() {
     this.gameInit();
-    this.p2p.send(this.gameData);
+    this.p2p.send({
+      restart: true
+    });
   }
 
   pushNotification(notification: History, newTurn = false) {
-    // don't need to show notification on my turn
-    if (!newTurn && this.isMyTurn()) {
-      return;
-    }
     this.notification = {
       newTurn: newTurn,
       history: notification
@@ -358,7 +361,13 @@ export class DavinciCodeComponent implements OnInit {
     this.gameData.currentTurn.guessCorrectly = null;
   }
 
-  isMyTurn(): boolean {
+  isMyTurn(member?: Member): boolean {
+    if (member) {
+      if (this.gameData.currentTurn.memberIndex === null) {
+        return false;
+      }
+      return this.gameData.members[this.gameData.currentTurn.memberIndex].id === member.id;
+    }
     if (!this.utils.has(this.gameData, 'currentTurn') || this.gameData.currentTurn.memberIndex === null) {
       return false;
     }
@@ -738,6 +747,17 @@ export class DavinciCodeComponent implements OnInit {
     cards.push(this.gameData.currentTurn.newCard);
     // sort the member's cards
     this.gameData.members[this.gameData.currentTurn.memberIndex].cards = cards.sort(this.sortCards);
+  }
+
+  /**
+   * Member can manually request for the latest data from host
+   */
+  refreshData() {
+    this.isRefreshing = true;
+    setTimeout(() => this.isRefreshing = false, 10000);
+    this.p2p.send({
+      refresh: true
+    });
   }
 
 
