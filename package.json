@@ -1,6 +1,6 @@
 {
   "name": "game",
-  "displayName": "XieTiaoGame",
+  "displayName": "谐调游戏",
   "version": "0.0.1",
   "description": "This is a gaming system developed by XieTiao.",
   "author": "Shawn",
@@ -32,13 +32,13 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.26",
     "@fortawesome/free-solid-svg-icons": "^5.12.0",
     "bootstrap": "^4.4.1",
+    "cordova-android": "^8.1.0",
     "jquery": "^3.4.1",
     "lodash": "^4.17.15",
     "peerjs": "^1.2.0",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
-    "zone.js": "~0.9.1",
-    "cordova-android": "^8.1.0"
+    "zone.js": "~0.9.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.803.24",
