@@ -50,6 +50,9 @@
           <span *ngIf="member.id !== p2p.getId()">{{ member.name }}</span>
           <ng-container *ngIf="member.id === p2p.getId()">
             <span>{{ utils.lang('My Cards') }}</span>
+          </ng-container>
+          <button class="border-0 bg-transparent btn-no-focus text-primary" (click)="getVideo(member.id)"><fa-icon icon="video"></fa-icon></button>
+          <ng-container *ngIf="member.id === p2p.getId()">
             <app-davinci-code-card
               *ngIf="isGuessingCard()"
               [color]="gameData.currentTurn.newCard.color"
@@ -83,6 +86,7 @@
         <div *ngIf="showPlaceholderAtLast(member)" class="col-2">
           <app-davinci-code-card placeholder=true (click)="reorderCardToIndex(member.cards.length)"></app-davinci-code-card>
         </div>
+        <video [id]="'video-' + member.id" autoplay="true" style="width: 100%"></video>
       </div>
 
       <ng-container *ngIf="isGuessingCardOfMember(member)">

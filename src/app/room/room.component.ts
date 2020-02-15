@@ -22,7 +22,10 @@ export class RoomComponent implements OnInit {
   };
   name: string;
   // room members list
-  roomMembers: string[] = [];
+  roomMembers: {
+    id: string;
+    name: string;
+  }[] = [];
   // the room number to join
   roomId: string;
   joiningRoom: boolean;
@@ -40,12 +43,12 @@ export class RoomComponent implements OnInit {
     this.p2p.init();
     this.storage.setGameData({});
     if (this.storage.get('name')) {
-      this.roomMembers = [this.storage.get('name')];
+      this.roomMembers = [{id: this.p2p.getId(), name: this.storage.get('name')}];
     }
     this.utils.getEvent('game-data').subscribe(res => {
       // host user receive the data that a new user has joined this room
       if (this.utils.has(res, 'newUser') && res.newUser && this.storage.isHost()) {
-        this.roomMembers.push(res.name);
+        this.roomMembers.push({id: res.id, name: res.name});
         const gameData = this.storage.getGameData();
         // initialise the host info if not set yet
         if (!this.utils.has(gameData, 'members')) {
@@ -63,6 +66,7 @@ export class RoomComponent implements OnInit {
         this.storage.setGameData(gameData);
         // connect to this new peer
         this.p2p.connect(res.id);
+        this.p2p.call(res.id);
         // send the info to the new user
         this.p2p.send(gameData, true);
         // broadcast the latest info to all users
@@ -71,7 +75,7 @@ export class RoomComponent implements OnInit {
 
       // room member user receive the data to update members
       if (this.utils.has(res, 'members')) {
-        this.roomMembers = res.members.map(member => member.name);
+        this.roomMembers = res.members;
         // save game data in local storage (only need to know how many members are in the room)
         this.storage.setGameData({members: res.members});
       }
@@ -83,12 +87,21 @@ export class RoomComponent implements OnInit {
     });
   }
 
+  getVideo(id) {
+    const stream = this.p2p.getStream(id);
+    if (!stream) {
+      return;
+    }
+    const video = <HTMLVideoElement>document.getElementById('video-' + id);
+    video.srcObject = stream;
+  }
+
   saveName() {
     if (!this.name) {
       return;
     }
     this.storage.set('name', this.name);
-    this.roomMembers = [this.name];
+    this.roomMembers = [{id: this.p2p.getId(), name: this.name}];
   }
 
   back() {
@@ -107,6 +120,7 @@ export class RoomComponent implements OnInit {
       this.p2p.init();
     }
     this.p2p.connect(this.roomId);
+    this.p2p.call(this.roomId);
     this.p2p.send(
       {
         newUser: true,

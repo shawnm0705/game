@@ -199,6 +199,15 @@ export class DavinciCodeComponent implements OnInit {
     );
   }
 
+  getVideo(id) {
+    const stream = this.p2p.getStream(id);
+    if (!stream) {
+      return;
+    }
+    const video = <HTMLVideoElement>document.getElementById('video-' + id);
+    video.srcObject = stream;
+  }
+
   /************************
     Preparation
   ************************/

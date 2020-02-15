@@ -24,13 +24,10 @@
       </div>
     </div>
 
-    <div *ngIf="storage.isHost()" class="row mt-3">
+    <div *ngIf="storage.isHost()" class="row my-3">
       <div class="col-12 text-left">
         <p>{{ utils.lang('My Room Id') }}: <span class="text-info">{{ p2p.getId() }}</span></p>
-        <p>{{ utils.lang('People In The Room') }}: ({{ games[game].min }} - {{ games[game].max }} {{ utils.lang('people') }})</p>
-        <ul class="list-group mt-2">
-          <li *ngFor="let member of roomMembers" class="list-group-item"><fa-icon icon="user-alt" class="text-info mr-2"></fa-icon>{{ member }}</li>
-        </ul>
+        <ng-container *ngTemplateOutlet="roomList"></ng-container>
       </div>
       <div class="col-12 text-center mt-2">
         <button class="btn btn-success" [disabled]="roomMembers.length < games[game].min || roomMembers.length > games[game].max" (click)="start()">{{ utils.lang('Start Game') }}</button>
@@ -44,13 +41,22 @@
         <button class="btn btn-success btn-sm" [disabled]="joiningRoom" (click)="join()">{{ utils.lang('Join') }}</button>
       </div>
       <div *ngIf="roomMembers.length > 1" class="col-12 text-left">
-        <p>{{ utils.lang('People In The Room') }}: ({{ games[game].min }} - {{ games[game].max }} {{ utils.lang('people') }})</p>
-        <ul class="list-group mt-2">
-          <li *ngFor="let member of roomMembers" class="list-group-item"><fa-icon icon="user-alt" class="text-info mr-2"></fa-icon>{{ member }}</li>
-        </ul>
+        <ng-container *ngTemplateOutlet="roomList"></ng-container>
       </div>
     </div>
 
   </ng-container>
 
 </div>
+
+<ng-template #roomList>
+  <p>{{ utils.lang('People In The Room') }}: ({{ games[game].min }} - {{ games[game].max }} {{ utils.lang('people') }})</p>
+  <ul class="list-group mt-2">
+    <li *ngFor="let member of roomMembers" class="list-group-item">
+      <fa-icon icon="user-alt" class="text-info mr-2"></fa-icon>
+      {{ member.name }}
+      <button class="border-0 bg-transparent btn-no-focus text-primary" (click)="getVideo(member.id)"><fa-icon icon="video"></fa-icon></button>
+      <video [id]="'video-' + member.id" autoplay="true" style="width: 100%"></video>
+    </li>
+  </ul>
+</ng-template>
