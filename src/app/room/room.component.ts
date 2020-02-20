@@ -87,12 +87,35 @@ export class RoomComponent implements OnInit {
     });
   }
 
-  getVideo(id) {
-    const stream = this.p2p.getStream(id);
+  /**
+   * Get the video stream of a member
+   * @param id Id of the member
+   */
+  getVideo(id: string): void {
+    let stream;
+    if (id === this.p2p.getId()) {
+      return navigator.getUserMedia(
+        {video: true, audio: true},
+        stream => {
+          stream = stream;
+          this.videoStream(id, stream);
+        }, err => {
+          console.log(err);
+        }
+      );
+    }
+    stream = this.p2p.getStream(id);
     if (!stream) {
       return;
     }
+    this.videoStream(id, stream);
+  }
+
+  videoStream(id: string, stream: MediaStream): void {
     const video = <HTMLVideoElement>document.getElementById('video-' + id);
+    if (!video) {
+      return;
+    }
     video.srcObject = stream;
   }
 
