@@ -34,7 +34,7 @@
     "bootstrap": "^4.4.1",
     "cordova-android": "^8.1.0",
     "jquery": "^3.4.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "peerjs": "^1.2.0",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
